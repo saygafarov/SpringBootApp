@@ -5,8 +5,9 @@ import com.edu.ulab.app.dto.UserDto;
 import com.edu.ulab.app.mapper.BookMapper;
 import com.edu.ulab.app.mapper.UserMapper;
 
-import com.edu.ulab.app.service.impl.BookServiceImplTemplate;
-import com.edu.ulab.app.service.impl.UserServiceImplTemplate;
+import com.edu.ulab.app.service.impl.BookServiceImpl;
+import com.edu.ulab.app.service.impl.UserServiceImpl;
+import com.edu.ulab.app.web.request.UpdateUserBookRequest;
 import com.edu.ulab.app.web.request.UserBookRequest;
 import com.edu.ulab.app.web.response.UserBookResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +19,13 @@ import java.util.Objects;
 @Slf4j
 @Component
 public class UserDataFacade {
-    private final UserServiceImplTemplate userService;
-    private final BookServiceImplTemplate bookService;
+    private final UserServiceImpl userService;
+    private final BookServiceImpl bookService;
     private final UserMapper userMapper;
     private final BookMapper bookMapper;
 
-    public UserDataFacade(UserServiceImplTemplate userService,
-                          BookServiceImplTemplate bookService,
+    public UserDataFacade(UserServiceImpl userService,
+                          BookServiceImpl bookService,
                           UserMapper userMapper,
                           BookMapper bookMapper) {
         this.userService = userService;
@@ -37,7 +38,6 @@ public class UserDataFacade {
         log.info("Got user book create request: {}", userBookRequest);
         UserDto userDto = userMapper.userRequestToUserDto(userBookRequest.getUserRequest());
         log.info("Mapped user request: {}", userDto);
-
         UserDto createdUser = userService.createUser(userDto);
         log.info("Created user: {}", createdUser);
 
@@ -59,14 +59,48 @@ public class UserDataFacade {
                 .build();
     }
 
-    public UserBookResponse updateUserWithBooks(UserBookRequest userBookRequest) {
-        return null;
+    public UserBookResponse updateUserWithBooks(UpdateUserBookRequest updateUserWithBookRequest) {
+        log.debug("Got user book update request: {}", updateUserWithBookRequest);
+        UserDto userDto = userMapper.updateUserRequestToUserDto(updateUserWithBookRequest.getUserRequest());
+        log.debug("Mapped user request: {}", userDto);
+        UserDto userUpdated = userService.updateUser(userDto);
+        log.debug("Updated user: {}", userUpdated);
+
+        List<Long> bookUpdated = updateUserWithBookRequest.getBookRequests()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(bookMapper::updateBookRequestToBookDto)
+                .peek(bookDto -> bookDto.setUserId(userUpdated.getId()))
+                .peek(mappedBookDto -> log.debug("mapped book: {}", mappedBookDto))
+                .map(bookService::updateBook)
+                .peek(updateBook -> log.debug("Updated book: {}", updateBook))
+                .map(BookDto::getId)
+                .toList();
+        log.debug("Collected book updated: {}", bookUpdated);
+
+        return UserBookResponse.builder()
+                .userId(userUpdated.getId())
+                .booksIdList(bookUpdated)
+                .build();
     }
 
     public UserBookResponse getUserWithBooks(Long userId) {
-        return null;
+        log.debug("Got user id get user with books: {}", userId);
+        UserDto userById = userService.getUserById(userId);
+        log.debug("Get user by id: {}", userById);
+        List<Long> books = bookService.getBookByUserId(userId);
+        log.debug("Get books by user: {}", books);
+
+        return UserBookResponse.builder()
+                .userId(userById.getId())
+                .booksIdList(books)
+                .build();
     }
 
     public void deleteUserWithBooks(Long userId) {
+        log.debug("Got id delete user by id: {}", userId);
+        bookService.getBookByUserId(userId).forEach(bookService::deleteBookById);
+        userService.deleteUserById(userId);
+        log.debug("User was delete.");
     }
 }
