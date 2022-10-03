@@ -41,7 +41,7 @@ public class BookServiceImplTemplate implements BookService {
     public BookDto createBook(@NotNull BookDto bookDto) {
         log.debug("Got bookDto create book: {}", bookDto);
         if (verificationBookDto(bookDto)) {
-            throw new BookNotFoundException(bookDto);
+            throw new BookNotFoundException(bookMapper.bookDtoToBook(bookDto));
         }
 
         jdbcTemplate.update(
@@ -63,7 +63,7 @@ public class BookServiceImplTemplate implements BookService {
     public BookDto updateBook(@NotNull BookDto bookDto) {
         log.debug("Got bookDto update book: {}", bookDto);
         if (verificationBookDto(bookDto)) {
-            throw new BookNotFoundException(bookDto);
+            throw new BookNotFoundException(bookMapper.bookDtoToBook(bookDto));
         }
 
         jdbcTemplate.update(

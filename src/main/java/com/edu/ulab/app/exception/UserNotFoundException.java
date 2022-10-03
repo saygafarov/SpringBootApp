@@ -5,12 +5,10 @@ import com.edu.ulab.app.entity.Person;
 
 public class UserNotFoundException extends RuntimeException {
 
+    public UserNotFoundException(String message) { super(message);}
+
     public UserNotFoundException(Person person) {
         super("Not found person: " + person.toString());
-    }
-
-    public UserNotFoundException(UserDto userDto) {
-        super("Not found userDto: " + userDto.toString());
     }
 
     public UserNotFoundException(Long id) {

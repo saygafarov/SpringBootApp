@@ -2,9 +2,12 @@ package com.edu.ulab.app.service.impl;
 
 import com.edu.ulab.app.dto.BookDto;
 import com.edu.ulab.app.entity.Book;
+import com.edu.ulab.app.entity.Person;
 import com.edu.ulab.app.exception.BookNotFoundException;
+import com.edu.ulab.app.exception.UserNotFoundException;
 import com.edu.ulab.app.mapper.BookMapper;
 import com.edu.ulab.app.repository.BookRepository;
+import com.edu.ulab.app.repository.UserRepository;
 import com.edu.ulab.app.service.BookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,23 +21,28 @@ import java.util.Objects;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
     private final BookMapper bookMapper;
 
     public BookServiceImpl(BookRepository bookRepository,
-                           BookMapper bookMapper) {
+                           UserRepository userRepository, BookMapper bookMapper) {
         this.bookRepository = bookRepository;
+        this.userRepository = userRepository;
         this.bookMapper = bookMapper;
     }
 
     @Override
     public BookDto createBook(@NotNull BookDto bookDto) {
         log.debug("Got bookDto update bookMapper: {}", bookDto);
-        if (verificationBookDto(bookDto)) {
-            throw new BookNotFoundException(bookDto);
-        }
         Book book = bookMapper.bookDtoToBook(bookDto);
         log.info("Mapped book: {}", book);
+        if (verificationBookDto(bookDto)) {
+            throw new BookNotFoundException(book);
+        }
+        Person person = userRepository.findById(book.getId()).orElseThrow();
+        log.debug("Got person user Repository: {}", person);
+        book.setPerson(person);
         Book savedBook = bookRepository.save(book);
         log.info("Saved book: {}", savedBook);
 
@@ -44,11 +52,14 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto updateBook(@NotNull BookDto bookDto) {
         log.debug("Got bookDto create Book: {}", bookDto);
-        if (verificationBookDto(bookDto)) {
-            throw new BookNotFoundException(bookDto);
-        }
         Book book = bookMapper.bookDtoToBook(bookDto);
         log.debug("Mapped book: {}", book);
+        if (verificationBookDto(bookDto)) {
+            throw new BookNotFoundException(book);
+        }
+        Person person = userRepository.findById(book.getId()).orElseThrow();
+        log.debug("Got person user Repository: {}", person);
+        book.setPerson(person);
         Book checkedBook = bookRepository
                 .findById(book.getId())
                 .orElseThrow(() -> new BookNotFoundException(book));
@@ -82,7 +93,7 @@ public class BookServiceImpl implements BookService {
 
     public List<Long> getBookByUserId(Long userId) {
         return bookRepository
-                .findByUserId(userId)
+                .findAllByPersonId(userId)
                 .stream()
                 .filter(Objects::nonNull)
                 .map(Book::getId)
