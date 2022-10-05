@@ -1,9 +1,16 @@
 # SpringBootApp
-Actuator : http://localhost:8091/app/actuator /n
+Actuator : http://localhost:8091/app/actuator 
+
+
+
 Swagger : http://localhost:8091/app/swagger-ui/index.html
+
+
+
 Headers in Postman 
 ![headers](https://user-images.githubusercontent.com/83407341/194144522-7ee0bfb6-6fde-45ad-b7f7-7986276448b3.png)
 UserController
+
 1. Create
 ![create](https://user-images.githubusercontent.com/83407341/194146402-d32373c5-35db-4c5b-8e8c-edd687e974fa.png)
 2. Update
