@@ -1,22 +1,11 @@
 package com.edu.ulab.app.entity;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
@@ -31,6 +20,9 @@ public class Book {
     private Long id;
 
     @Column(nullable = false)
+    private Long userId;
+
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -39,9 +31,10 @@ public class Book {
     @Column(nullable = false)
     private long pageCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
+
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "person_id", nullable = false)
+//    private Person person;
 
     @Override
     public boolean equals(Object o) {
@@ -52,9 +45,8 @@ public class Book {
 
         if (pageCount != book.pageCount) return false;
         if (!Objects.equals(id, book.id)) return false;
-        //if (!Objects.equals(userId, book.userId)) return false;
+        if (!Objects.equals(userId, book.userId)) return false;
         if (!Objects.equals(title, book.title)) return false;
-        if (!Objects.equals(person, book.person)) return false;
         return Objects.equals(author, book.author);
     }
 

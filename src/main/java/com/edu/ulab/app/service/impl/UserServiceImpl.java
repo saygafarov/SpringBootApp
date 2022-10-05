@@ -6,23 +6,22 @@ import com.edu.ulab.app.exception.UserNotFoundException;
 import com.edu.ulab.app.mapper.UserMapper;
 import com.edu.ulab.app.repository.UserRepository;
 import com.edu.ulab.app.service.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 
 @Slf4j
 @Service
+@Primary
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository,
-                           UserMapper userMapper) {
-        this.userRepository = userRepository;
-        this.userMapper = userMapper;
-    }
 
     @Override
     public UserDto createUser(@NotNull UserDto userDto) {
@@ -46,15 +45,13 @@ public class UserServiceImpl implements UserService {
         if (verificationUserDto(userDto)) {
             throw new UserNotFoundException(person);
         }
-        Person checkedPerson = userRepository
-                .findById(person.getId())
-                .orElseThrow(() -> new UserNotFoundException(person));
-        person.setId(checkedPerson.getId());
-        log.debug("Update personUpdated: {}", checkedPerson);
-        Person personUpdated = userRepository.save(person);
-        log.debug("Update personUpdated: {}", personUpdated);
+        Person updatedPerson = userRepository.findById(userDto.getId())
+                .map(user -> userMapper.userDtoToPerson(userDto))
+                .map(userRepository::save)
+                .orElseThrow(() -> new UserNotFoundException(userDto.getId()));
+        log.info("Updated user: {}", updatedPerson);
 
-        return userMapper.personToUserDto(personUpdated);
+        return userMapper.personToUserDto(updatedPerson);
     }
 
     @Override

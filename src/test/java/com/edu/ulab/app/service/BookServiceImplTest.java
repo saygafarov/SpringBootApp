@@ -68,7 +68,7 @@ public class BookServiceImplTest {
         book.setPageCount(1000);
         book.setTitle("test title");
         book.setAuthor("test author");
-        book.setPerson(person);
+        book.setUserId(person.getId());
 
         result = new BookDto();
         result.setId(1L);
@@ -82,7 +82,7 @@ public class BookServiceImplTest {
         savedBook.setPageCount(1000);
         savedBook.setTitle("test title");
         savedBook.setAuthor("test author");
-        savedBook.setPerson(person);
+        savedBook.setUserId(person.getId());
     }
 
     @Test
@@ -134,14 +134,14 @@ public class BookServiceImplTest {
         //given
         Book book = new Book();
         book.setId(1L);
-        book.setPerson(person);
+        book.setUserId(person.getId());
         book.setAuthor("Author");
         book.setTitle("Title");
         book.setPageCount(1000);
 
         Book savedBook = new Book();
         savedBook.setId(1L);
-        savedBook.setPerson(person);
+        savedBook.setUserId(person.getId());
         savedBook.setAuthor("Author");
         savedBook.setTitle("Title");
         savedBook.setPageCount(1000);
@@ -176,14 +176,14 @@ public class BookServiceImplTest {
 
         Book bookOne = new Book();
         bookOne.setId(1L);
-        bookOne.setPerson(person);
+        bookOne.setUserId(person.getId());
         bookOne.setAuthor("Author One");
         bookOne.setTitle("Title One");
         bookOne.setPageCount(1000);
 
         Book savedBookOne = new Book();
         savedBookOne.setId(1L);
-        savedBookOne.setPerson(person);
+        savedBookOne.setUserId(person.getId());
         savedBookOne.setAuthor("Author One");
         savedBookOne.setTitle("Title One");
         savedBookOne.setPageCount(1000);
@@ -202,7 +202,7 @@ public class BookServiceImplTest {
         bookDtoTwo.setPageCount(2000);
 
         Book bookTwo = new Book();
-        bookTwo.setPerson(person);
+        bookTwo.setUserId(person.getId());
         bookTwo.setId(2L);
         bookTwo.setAuthor("Author Two");
         bookTwo.setTitle("Title Two");
@@ -210,7 +210,7 @@ public class BookServiceImplTest {
 
         Book savedBookTwo = new Book();
         savedBookTwo.setId(2L);
-        savedBookTwo.setPerson(person);
+        savedBookTwo.setUserId(person.getId());
         savedBookTwo.setAuthor("Author Two");
         savedBookTwo.setTitle("Title Two");
         savedBookTwo.setPageCount(2000);
@@ -238,10 +238,8 @@ public class BookServiceImplTest {
         when(bookRepository.findAllByPersonId(1L)).thenReturn(books);
 
         //then
-        List<Long> bookByUserId = bookService.getBookByUserId(1L);
+        List<BookDto> bookByUserId = bookService.getBooksByUserId(1L);
         assertEquals(2, bookByUserId.size());
-        assertEquals(1L, bookByUserId.get(0));
-        assertEquals(2L, bookByUserId.get(1));
     }
 
     @Test

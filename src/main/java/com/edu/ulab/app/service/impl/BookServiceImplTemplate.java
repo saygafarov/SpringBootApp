@@ -107,16 +107,16 @@ public class BookServiceImplTemplate implements BookService {
         }
     }
 
-    public List<Long> getBookByUserId(Long userId) {
+    @Override
+    public List<BookDto> getBooksByUserId(Long userId) {
         log.debug("Got id user to get: {}", userId);
 
-        List<Book> books = jdbcTemplate
-                .query(SELECT_FROM_BOOK_USER_ID, new BeanPropertyRowMapper<>(Book.class), userId);
+        List<BookDto> books = jdbcTemplate
+                .query(SELECT_FROM_BOOK_USER_ID, new BeanPropertyRowMapper<>(BookDto.class), userId);
         log.debug("Get books: {}", books);
 
         return books.stream()
                 .filter(Objects::nonNull)
-                .map(Book::getId)
                 .peek(book -> log.debug("Book id: {}", book))
                 .toList();
     }
