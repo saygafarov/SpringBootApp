@@ -27,11 +27,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(@NotNull UserDto userDto) {
         log.debug("Got userDto update userMapper: {}", userDto);
-        if (verificationUserDto(userDto)) {
-            throw new UserNotFoundException(userDto);
-        }
         Person user = userMapper.userDtoToPerson(userDto);
         log.info("Mapped user: {}", user);
+        if (verificationUserDto(userDto)) {
+            throw new UserNotFoundException(user);
+        }
         Person savedUser = userRepository.save(user);
         log.info("Saved user: {}", savedUser);
 
@@ -41,14 +41,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(@NotNull UserDto userDto) {
         log.debug("Got userDto update userMapper: {}", userDto);
-        if (verificationUserDto(userDto)) {
-            throw new UserNotFoundException(userDto);
-        }
         Person person = userMapper.userDtoToPerson(userDto);
         log.debug("Mapped personDto: {}", person);
+        if (verificationUserDto(userDto)) {
+            throw new UserNotFoundException(person);
+        }
         Person checkedPerson = userRepository
                 .findById(person.getId())
                 .orElseThrow(() -> new UserNotFoundException(person));
+        person.setId(checkedPerson.getId());
         log.debug("Update personUpdated: {}", checkedPerson);
         Person personUpdated = userRepository.save(person);
         log.debug("Update personUpdated: {}", personUpdated);

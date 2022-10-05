@@ -39,7 +39,7 @@ public class UserServiceImplTemplate implements UserService {
     public UserDto createUser(@NotNull UserDto userDto) {
         log.debug("Got userDto create user: {}", userDto);
         if (verificationUserDto(userDto)) {
-            throw new UserNotFoundException(userDto);
+            throw new UserNotFoundException(userMapper.userDtoToPerson(userDto));
         }
         jdbcTemplate.update(
                 connection -> {
@@ -60,7 +60,7 @@ public class UserServiceImplTemplate implements UserService {
     public UserDto updateUser(@NotNull UserDto userDto) {
         log.debug("Got userDto update user: {}", userDto);
         if (verificationUserDto(userDto)) {
-            throw new UserNotFoundException(userDto);
+            throw new UserNotFoundException(userMapper.userDtoToPerson(userDto));
         }
         jdbcTemplate.update(
                 connection -> {
